@@ -21,9 +21,9 @@ cd $DATADIR
 conditions="R_NAcc L_NAcc VTA R_Caudate L_Caudate R_Putamen L_Putamen" 
 
 #subjs="10195_20190321 11228_20190418 11248_20190307 11289_20181011 11299_20180120 11393_20190502 11394_20190111 11409_20190221 11421_20181018 11426_20190214 11431_20190131 11441_20190117 11444_20190308 11449_20190228 11458_20190314 11461_20190207 11481_20190208 11543_20180626 11592_20180810 11595_20180728 11599_20180816 11641_20180703 11660_20180619 11671_20180723"
-subjs="10195_20160317"
-#for subj in $DATADIR/1*; do
-for subj in $subjs; do
+#subjs="10195_20160317"
+#for subj in $subjs; do
+for subj in $DATADIR/1*; do
 
 # 04/22/2019 - Ash removed this becasue files are already created now. 
 #[ ! -r $subj/background_connectivity/${censor_file} ] &&
@@ -33,9 +33,9 @@ for subj in $subjs; do
    for condition in $conditions; do
       sub_id=$(basename "$subj")
     
-ts_file=$subj/background_connectivity/*_${condition}_gsr.1D
-    
-echo $subj $sub_id $condition
+      ts_file=$subj/background_connectivity/*_${condition}_gsr.1D
+          
+      echo $subj $sub_id $condition
       if [[ -r $ts_file || -r $subj/background_connectivity/cbgnfswdktm_tent_resid.nii.gz ]];
       then
          echo "all seed ROI ts & resid files exist"
@@ -48,16 +48,24 @@ echo $subj $sub_id $condition
       # dont rerun already finished #04/22/2019 Ash removed this because need it to overwrite them anyway
       finalfile=$subj/background_connectivity/${sub_id}_3ddeconvolve_model_resid_${condition}+tlrc.HEAD 
       [ -r $finalfile ] && echo "have $finalfile, skipping" && continue
-      echo "making $finalfile"
       #run 3dDeconvolve
 
      # [ ! -r $subj/background_connectivity/${sub_id}_3ddeconvolve_corr_${condition}+tlrc.HEAD ] && 
     
+     # move outputs to hera
+     outdir=$subj/background_connectivity/
+     outdir=${outdir/Phillips/Hera/Projects}
+     [ ! -d $outdir ] && mkdir -p $outdir
+
+      finalfile=$outdir/${sub_id}_3ddeconvolve_model_resid_${condition}+tlrc.HEAD 
+      [ -r $finalfile ] && echo "have $finalfile, skipping" && continue
+      echo "making $finalfile"
+
      3dDeconvolve -input $subj/background_connectivity/cbgnfswdktm_tent_resid.nii.gz -polort 3 \
-         -num_stimts 1 -stim_file 1 $ts_file \
-         -rout -bucket $subj/background_connectivity/${sub_id}_3ddeconvolve_corr_${condition} \
-         -errts $subj/background_connectivity/${sub_id}_3ddeconvolve_model_resid_${condition} \
          -censor $subj/background_connectivity/${censor_file} \
+         -num_stimts 1 -stim_file 1 $ts_file \
+         -rout -bucket $outdir/${sub_id}_3ddeconvolve_corr_${condition} \
+         -errts $outdir/${sub_id}_3ddeconvolve_model_resid_${condition} \
          -jobs 20 \
          -overwrite
             
@@ -80,11 +88,11 @@ echo $subj $sub_id $condition
 
       #3dcalc -a $subj/background_connectivity/${sub_id}_${condition}_REML_r+tlrc. -expr 'log((1+a)/(1-a))/2' -prefix $subj/background_connectivity/${sub_id}_${condition}_REML_r_Z -overwrite 
  
- #DO 3DCALC ON THE NON REML ONES TO SEE IF THAT CHANGES THE MAGNITUDE OF THE CORRELATIONS. 
-   3dcalc -a $subj/background_connectivity/${sub_id}_3ddeconvolve_corr_${condition}+tlrc.[3] -b $subj/background_connectivity/${sub_id}_3ddeconvolve_corr_${condition}+tlrc.[2] \
-        -expr 'ispositive(b)*sqrt(a)-isnegative(b)*sqrt(a)' -prefix $subj/background_connectivity/${sub_id}_${condition}_r -overwrite
+    #DO 3DCALC ON THE NON REML ONES TO SEE IF THAT CHANGES THE MAGNITUDE OF THE CORRELATIONS. 
+     3dcalc -a $outdir/${sub_id}_3ddeconvolve_corr_${condition}+tlrc.[3] -b $outdir/${sub_id}_3ddeconvolve_corr_${condition}+tlrc.[2] \
+        -expr 'ispositive(b)*sqrt(a)-isnegative(b)*sqrt(a)' -prefix $outdir/${sub_id}_${condition}_r -overwrite
 
-     3dcalc -a $subj/background_connectivity/${sub_id}_${condition}_r+tlrc. -expr 'log((1+a)/(1-a))/2' -prefix $subj/background_connectivity/${sub_id}_${condition}_r_Z -overwrite 
+     3dcalc -a $outdir/${sub_id}_${condition}_r+tlrc. -expr 'log((1+a)/(1-a))/2' -prefix $outdir/${sub_id}_${condition}_r_Z -overwrite 
   
   done
 done
