@@ -26,9 +26,16 @@ conditions="R_NAcc L_NAcc VTA R_Caudate L_Caudate R_Putamen L_Putamen"
 for subj in $DATADIR/1*; do
 
 # 04/22/2019 - Ash removed this becasue files are already created now. 
-#[ ! -r $subj/background_connectivity/${censor_file} ] &&
-#   cat $subj/func/[1-6]/motion_info/censor_custom_fd_0.3_dvars_Inf.1d > $subj/background_connectivity/${censor_file}
-#   [ ! -z $subj/background_connectivity/${censor_file} ] && echo "Could not create censor file, skipping" && continue
+
+   # 20190509 dont try if we dont have the censor file
+   censor_merged=$subj/background_connectivity/$censor_file
+   [ ! -r $censor_merged ] && echo "no censor merge files! ($censor_merged)" && continue
+   if [ $(cat $censor_merged | wc -l) -eq 0 ]; then
+      ntsc=$(cat $subj/func/[1-6]/motion_info/censor_custom_fd_0.3_dvars_Inf.1d | wc -l )
+      [ $ntsc -ne 1200 ] && echo "wrong number of censored rows ($ntsc)" && continue
+      cat $subj/func/[1-6]/motion_info/censor_custom_fd_0.3_dvars_Inf.1d > $subj/background_connectivity/${censor_file}
+   fi
+   [ ! -r $censor_merged ] && echo "failed to make $censor_merged" && continue
 
    for condition in $conditions; do
       sub_id=$(basename "$subj")
@@ -62,7 +69,7 @@ for subj in $DATADIR/1*; do
       echo "making $finalfile"
 
      3dDeconvolve -input $subj/background_connectivity/cbgnfswdktm_tent_resid.nii.gz -polort 3 \
-         -censor $subj/background_connectivity/${censor_file} \
+         -censor $censor_merged \
          -num_stimts 1 -stim_file 1 $ts_file \
          -rout -bucket $outdir/${sub_id}_3ddeconvolve_corr_${condition} \
          -errts $outdir/${sub_id}_3ddeconvolve_model_resid_${condition} \
