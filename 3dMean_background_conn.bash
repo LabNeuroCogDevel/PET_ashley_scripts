@@ -8,9 +8,9 @@
 #Need to grab files from only those subs who have both RS and background ts files. 
 #Also need to only pull out visit 1 data.  
 
-BG_DATADIR=/Volumes/Phillips/mMR_PETDA/subjs
+BG_DATADIR=/Volumes/Hera/Projects/mMR_PETDA/subjs
 RS_DATADIR=/Volumes/Zeus/preproc/petrest_rac*/MHRest_FM_ica
-SAVEDIR=/Volumes/Phillips/mMR_PETDA/group_analysis_ashley
+SAVEDIR=/Volumes/Hera/Projects/mMR_PETDA/group_analysis_ashley
 conditions="R_NAcc L_NAcc VTA R_Caudate L_Caudate R_Putamen L_Putamen"
 #context="Background Rest"
 # under construction, just did a quick mean for now. In the future, I believe I should be grabbing only those people who have both background and rest files, but for now this is OK. 

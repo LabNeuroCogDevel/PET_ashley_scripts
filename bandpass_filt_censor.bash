@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#this was originally designed to bandpass filter + censor the tent resid files, but Will has a better script that does GSR + bandpassing at the same time so this one is now obsolete. 
 #Title: Bandpass_filt_censor2.bash
 #Author: Ashley Parr
 #Purpose: Script to bandpass filter output residuals with a censored file for both gam & tent files from 3dDeconvolve for use in background connectivity analyses 

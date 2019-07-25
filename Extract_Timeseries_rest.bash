@@ -12,7 +12,7 @@ set -euo pipefail
 #pwd
 atlas=/Volumes/Phillips/mMR_PETDA/atlas/Ashley/VMPFC_STRIATAL_VTA_ROIS_rsfunctemp.nii.gz
 mask=/Volumes/Phillips/mMR_PETDA/atlas/Ashley/Brain_Mask_GM_50thres_rsfunctemplate.nii.gz
-
+#temp_save_dir=/Volumes/Phillips/mMR_PETDA/group_analysis_ashley
 echo ${atlas}
 echo ${mask}
 
